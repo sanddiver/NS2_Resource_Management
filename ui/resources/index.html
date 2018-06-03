@@ -1,0 +1,665 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv='Content-Type' content='text/html;charset=UTF-8' />
+<title>ui</title>
+<!-- 1.) Load SAPUI5 (from a remote server), select theme and control library -->
+<script src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"
+	id="sap-ui-bootstrap" data-sap-ui-libs="sap.m"
+	data-sap-ui-theme="sap_bluecrystal">
+		</script>
+<script>
+    jQuery.sap.require("sap.m.MessageBox");
+    
+	var cellsEdit;
+	var ns2RMIDSearchValue;
+	var sapRMIDSearchValue;
+	var requestorNameSearchValue = "";
+	var customerNameSearchValue = "";
+	var requestStatusSearchValue = "";
+	var samSearchValue = "";
+	var lobSearchValue = "";
+	
+	function doSearchRM() 
+	{
+		ns2RMIDSearchValue = ns2RMID.getValue().trim();
+		sapRMIDSearchValue = sapRMID.getValue().trim();
+		requestorNameSearchValue = requestorNameSEL.getSelectedItem().getText().trim();
+		customerNameSearchValue = customerNameSEL.getSelectedItem().getText().trim();
+		requestStatusSearchValue = requestStatusSEL.getSelectedItem().getText().trim();
+		samSearchValue = samSEL.getSelectedItem().getText().trim();
+		lobSearchValue = lobSEL.getSelectedItem().getText().trim();
+
+    	var searchRMModel = new sap.ui.model.json.JSONModel("/searchRM.xsjs?ns2RMIDValue=" +  encodeURIComponent(ns2RMIDSearchValue) + "&sapRMIDValue=" + encodeURIComponent(sapRMIDSearchValue) + "&requestorNameValue=" +  encodeURIComponent(requestorNameSearchValue) + "&customerNameValue=" +  encodeURIComponent(customerNameSearchValue) + "&requestStatusValue=" +  encodeURIComponent(requestStatusSearchValue) + "&samValue=" +  encodeURIComponent(samSearchValue) + "&lobValue=" +  encodeURIComponent(lobSearchValue), false);         
+
+		searchRMTable.setModel(searchRMModel); 
+
+		searchRMTable.unbindItems();
+	
+		searchRMTable.bindItems("/searchRMResults", new sap.m.ColumnListItem("listItem",{
+                              cells : [ new sap.m.Text({text : "{ns2RMID}"}),
+                            			new sap.m.Text({text : "{sapRMID}"}),
+                            			new sap.m.Text({text : "{createdOn}"}),
+                            			new sap.m.Text({text : "{requestorName}"}),
+                            			new sap.m.Text({text : "{customerName}"}),
+                            			new sap.m.Text({text : "{roleDescription}"}),
+                            			new sap.m.Text({text : "{comments}"}),
+                            			new sap.m.Text({text : "{roleStart}"}),
+                            			new sap.m.Text({text : "{roleEnd}"}),
+                            			new sap.m.Text({text : "{noReqDays}"}),
+                            			new sap.m.Text({text : "{requestStatus}"}),
+                            			new sap.m.Text({text : "{sam}"}),
+                                        new sap.m.Text({text : "{lob}"}),
+                                        new sap.m.Button({icon : "sap-icon://edit",
+                                        	press: function(evt) {
+                								var row = evt.getSource().getParent();
+                								cellsEdit = row.getCells();
+                								ns2RMIDEdit.setValue(cellsEdit[0].getText());
+                								sapRMIDEdit.setValue(cellsEdit[1].getText());
+                								roleDescriptionEdit.setValue(cellsEdit[5].getText());
+                								commentsEdit.setValue(cellsEdit[6].getText());
+                								roleStartEdit.setValue(cellsEdit[7].getText());
+                								roleEndEdit.setValue(cellsEdit[8].getText());
+                								noReqDaysEdit.setValue(cellsEdit[9].getText());
+                								populateComboBoxes();
+				            					app.to("editRMEntryPage");   
+				        					} 
+                                        })
+                                      ]
+		}));
+	}
+	
+	var searchRMTable = new sap.m.Table("table",{ 
+                  columns : [ new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "NS2 RM ID"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "SAP RM ID"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "Created On"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "Requestor Name"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "Customer Name"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "Role Description"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "Comments"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "Role Start"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "Role End"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "No. Req. Days"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "Request Status"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "SAM"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : "LOB"}) ]
+                                               }),
+                              new sap.m.Column({
+                                        header :[ new sap.m.Label({text : ""}) ]
+                                               })
+                            ]
+	});
+	
+	function populateSearchSelects()
+	{
+		var requestorNameSELModel = new sap.ui.model.json.JSONModel("/requestorName.xsjs?withBlank=Y", false);
+		requestorNameSEL.setModel(requestorNameSELModel);
+    	var customerNameSELModel = new sap.ui.model.json.JSONModel("/customerName.xsjs?withBlank=Y", false);  
+		customerNameSEL.setModel(customerNameSELModel);
+		var requestStatusSELModel = new sap.ui.model.json.JSONModel("/requestStatus.xsjs?withBlank=Y", false);  
+		requestStatusSEL.setModel(requestStatusSELModel);
+    	var samSELModel = new sap.ui.model.json.JSONModel("/sam.xsjs?withBlank=Y", false);  
+		samSEL.setModel(samSELModel);		
+		var lobSELModel = new sap.ui.model.json.JSONModel("/lob.xsjs?withBlank=Y", false);  
+		lobSEL.setModel(lobSELModel);
+	}
+	
+	function populateComboBoxes()
+	{
+    	var requestorNameModel = new sap.ui.model.json.JSONModel("/requestorName.xsjs", false);  
+		requestorNameCB.setModel(requestorNameModel);	
+	    var customerNameModel = new sap.ui.model.json.JSONModel("/customerName.xsjs", false);  
+		customerNameCB.setModel(customerNameModel);
+	    var requestStatusModel = new sap.ui.model.json.JSONModel("/requestStatus.xsjs", false);  
+		requestStatusCB.setModel(requestStatusModel);
+	    var samModel = new sap.ui.model.json.JSONModel("/sam.xsjs", false);  
+		samCB.setModel(samModel);	
+	    var lobModel = new sap.ui.model.json.JSONModel("/lob.xsjs", false);  
+		lobCB.setModel(lobModel);
+	}
+
+    function updateRMEntry(ns2RMIDOrig, ns2RMID, sapRMID, requestorName, customerName, roleDescription, comments, roleStart, roleEnd, noReqDays, requestStatus, sam, lob) 
+    {
+    	var entryData = {};
+		entryData.ns2RMIDOrig = ns2RMIDOrig;
+		entryData.ns2RMID = ns2RMID;
+		entryData.sapRMID = sapRMID;
+		entryData.requestorName = requestorName;
+		entryData.customerName = customerName;
+		entryData.roleDescription = roleDescription;
+		entryData.comments = comments;
+		entryData.roleStart = roleStart;
+		entryData.roleEnd = roleEnd;
+		entryData.noReqDays = noReqDays;
+		entryData.requestStatus = requestStatus;
+		entryData.sam = sam;
+		entryData.lob = lob;
+
+        var updateData = JSON.stringify(entryData);
+
+        $.ajax({type: "POST",
+                url: "updateRMEntry.xsjs",
+                contentType: "application/json",
+                data: updateData,
+                dataType: "json",
+                crossDomain: true,
+                statusCode: {
+                	200: function(data) {
+						sap.m.MessageBox.information("Resource Management Entry successfully updated.", {
+						    title: "Information",                                // default
+						    onClose: null,                                       // default
+						    styleClass: "",                                      // default
+						    initialFocus: null,                                  // default
+						    textDirection: sap.ui.core.TextDirection.Inherit     // default
+						    });
+							    
+		        		cellsEdit[0].setText(ns2RMIDEdit.getValue().trim());
+		        		cellsEdit[1].setText(sapRMIDEdit.getValue().trim());
+		        		cellsEdit[3].setText(requestorNameCB.getValue().trim());
+		        		cellsEdit[4].setText(customerNameCB.getValue().trim());
+		        		cellsEdit[5].setText(roleDescriptionEdit.getValue().trim());
+		        		cellsEdit[6].setText(commentsEdit.getValue().trim());
+		        		cellsEdit[7].setText(roleStartEdit.getValue().trim());
+		        		cellsEdit[8].setText(roleEndEdit.getValue().trim());
+		        		cellsEdit[9].setText(noReqDaysEdit.getValue().trim());
+		        		cellsEdit[10].setText(requestStatusCB.getSelectedItem().getText().trim());
+		        		cellsEdit[11].setText(samCB.getValue().trim());
+		        		cellsEdit[12].setText(lobCB.getValue().trim());
+		            	app.to("searchRMResultsPage");   
+                	},
+                	400: function(data) {
+	                	var errorMessage = data.responseText;
+						sap.m.MessageBox.warning(errorMessage, {
+						    title: "Warning",                                    // default
+						    onClose: null,                                       // default
+						    styleClass: "",                                      // default
+						    initialFocus: null,                                  // default
+						    textDirection: sap.ui.core.TextDirection.Inherit     // default
+						    });
+                	}
+                }
+        });
+    }
+
+	var ns2RMID = new sap.m.Input({value:"", placeholder:"Enter NS2 RM ID"});
+	var sapRMID = new sap.m.Input({value:"", placeholder:"Enter SAP RM ID"});
+
+	var requestorNameSEL = new sap.m.Select().addEventDelegate({
+    	"onAfterRendering": function () {
+			if (requestorNameSearchValue !== "")
+			{
+				var item = requestorNameSEL.getItemByKey(requestorNameSearchValue);
+				requestorNameSEL.setSelectedItem(item);
+			}
+    	}}, this);
+	var requestorNameSELTemplate = new sap.ui.core.Item();
+	requestorNameSELTemplate.bindProperty("text", "requestorNameValue");
+	requestorNameSELTemplate.bindProperty("key", "requestorNameValue");
+	requestorNameSEL.bindItems("/requestorNameData", requestorNameSELTemplate);
+	
+	var customerNameSEL = new sap.m.Select().addEventDelegate({
+    	"onAfterRendering": function () {
+			if (customerNameSearchValue !== "")
+			{
+				var item = customerNameSEL.getItemByKey(customerNameSearchValue);
+				customerNameSEL.setSelectedItem(item);
+			}
+    	}}, this);
+	var customerNameSELTemplate = new sap.ui.core.ListItem();
+	customerNameSELTemplate.bindProperty("text", "customerNameValue");
+	customerNameSELTemplate.bindProperty("key", "customerNameValue");
+	customerNameSEL.bindItems("/customerNameData", customerNameSELTemplate);
+	
+	var requestStatusSEL = new sap.m.Select().addEventDelegate({
+    	"onAfterRendering": function () {
+			if (requestStatusSearchValue !== "")
+			{
+				var item = requestStatusSEL.getItemByKey(requestStatusSearchValue);
+				requestStatusSEL.setSelectedItem(item);
+			}
+    	}}, this);
+	var requestStatusSELTemplate = new sap.ui.core.ListItem();
+	requestStatusSELTemplate.bindProperty("text", "requestStatusValue");
+	requestStatusSELTemplate.bindProperty("key", "requestStatusValue");
+	requestStatusSEL.bindItems("/requestStatusData", requestStatusSELTemplate);
+
+	var samSEL = new sap.m.Select().addEventDelegate({
+    	"onAfterRendering": function () {
+			if (samSearchValue !== "")
+			{
+				var item = samSEL.getItemByKey(samSearchValue);
+				samSEL.setSelectedItem(item);
+			}
+    	}}, this);
+	var samSELTemplate = new sap.ui.core.ListItem();
+	samSELTemplate.bindProperty("text", "samValue");
+	samSELTemplate.bindProperty("key", "samValue");
+	samSEL.bindItems("/samData", samSELTemplate);
+
+	var lobSEL = new sap.m.Select().addEventDelegate({
+    	"onAfterRendering": function () {
+			if (lobSearchValue !== "")
+			{
+				var item = lobSEL.getItemByKey(lobSearchValue);
+				lobSEL.setSelectedItem(item);
+			}
+    	}}, this);
+	var lobSELTemplate = new sap.ui.core.ListItem();
+	lobSELTemplate.bindProperty("text", "lobValue");
+	lobSELTemplate.bindProperty("key", "lobValue");
+	lobSEL.bindItems("/lobData", lobSELTemplate);
+
+	populateSearchSelects();
+	
+	var requestorNameCB = new sap.m.ComboBox({
+			showSecondaryValues : false
+		}).addEventDelegate({
+    	"onAfterRendering": function () {
+			requestorNameCB.setValue(cellsEdit[3].getText());
+    	}}, this);
+	var requestorNameTemplate = new sap.ui.core.ListItem();
+	requestorNameTemplate.bindProperty("text", "requestorNameValue");
+	requestorNameCB.bindItems("/requestorNameData", requestorNameTemplate);
+
+	var customerNameCB = new sap.m.ComboBox({
+			showSecondaryValues : false
+		}).addEventDelegate({
+    	"onAfterRendering": function () {
+			customerNameCB.setValue(cellsEdit[4].getText());
+    	}}, this);
+	var customerNameTemplate = new sap.ui.core.ListItem();
+	customerNameTemplate.bindProperty("text", "customerNameValue");
+	customerNameCB.bindItems("/customerNameData", customerNameTemplate);
+
+	var requestStatusCB = new sap.m.Select().addEventDelegate({
+    	"onAfterRendering": function () {
+				var item = requestStatusCB.getItemByKey(cellsEdit[10].getText());
+				requestStatusCB.setSelectedItem(item);
+    	}}, this);
+	var requestStatusTemplate = new sap.ui.core.ListItem();
+	requestStatusTemplate.bindProperty("text", "requestStatusValue");
+	requestStatusTemplate.bindProperty("key", "requestStatusValue");
+	requestStatusCB.bindItems("/requestStatusData", requestStatusTemplate);
+	
+	var samCB = new sap.m.ComboBox({
+			showSecondaryValues : false
+		}).addEventDelegate({
+    	"onAfterRendering": function () {
+			samCB.setValue(cellsEdit[11].getText());
+    	}}, this);
+	var samTemplate = new sap.ui.core.ListItem();
+	samTemplate.bindProperty("text", "samValue");
+	samCB.bindItems("/samData", samTemplate);
+
+	var lobCB = new sap.m.ComboBox({
+			showSecondaryValues : false
+		}).addEventDelegate({
+    	"onAfterRendering": function () {
+			lobCB.setValue(cellsEdit[12].getText());
+    	}}, this);
+	var lobTemplate = new sap.ui.core.ListItem();
+	lobTemplate.bindProperty("text", "lobValue");
+	lobCB.bindItems("/lobData", lobTemplate);
+	
+	var searchRMPage = new sap.m.Page("searchRMPage", {
+    title: "Resource Management Search",
+    content: [ 
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "NS2 RM ID:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						ns2RMID
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "SAP RM ID:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						sapRMID
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "Requestor Name:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						requestorNameSEL
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "Customer Name:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						customerNameSEL
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "Request Status:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						requestStatusSEL
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "SAM:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						samSEL
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "LOB:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						lobSEL
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+				    	new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: ""})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						new sap.m.Button({   
+				        	text: "Search",
+				        	press: function() {
+				        		doSearchRM();
+				            	app.to("searchRMResultsPage");   
+				        	}
+				    	})
+					]
+	 	}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin")
+	]});
+
+	var searchRMResultsPage = new sap.m.Page("searchRMResultsPage", {
+    title: "Resource Management Search Results",
+    showNavButton: true,
+     navButtonPress: function(){ 
+     	populateSearchSelects();
+        app.to("searchRMPage");            
+     }, 
+    content: [ 
+    	searchRMTable
+	]});
+	
+	var ns2RMIDEdit = new sap.m.Input({value:"", placeholder:"Enter NS2 RM ID"});
+	var sapRMIDEdit = new sap.m.Input({value:"", placeholder:"Enter SAP RM ID"});
+	var roleDescriptionEdit = new sap.m.Input({value:"", placeholder:"Enter Role Description"});
+	var commentsEdit = new sap.m.Input({value:"", placeholder:"Enter Comments"});
+	var roleStartEdit = new sap.m.Input({value:"", placeholder:"Enter Role Start"});
+	var roleEndEdit = new sap.m.Input({value:"", placeholder:"Enter Role End"});
+	var noReqDaysEdit = new sap.m.Input({value:"", placeholder:"Enter No. Req. Days"});
+	
+	var editRMEntryPage = new sap.m.Page("editRMEntryPage", {
+    title: "Resource Management Edit",
+    showNavButton: true,
+     navButtonPress: function(){ 
+        app.to("searchRMResultsPage");            
+     }, 
+    content: [ 
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "NS2 RM ID:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						ns2RMIDEdit,
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: ""})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						new sap.m.HBox({
+							width : "8%",
+							items:[
+								new sap.m.Label ({text: "SAP RM ID:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						sapRMIDEdit
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "Requestor Name:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						requestorNameCB
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "Customer Name:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						customerNameCB
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "Role Description:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						roleDescriptionEdit
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "Comments:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						commentsEdit
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "Role Start:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						roleStartEdit,
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: ""})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						new sap.m.HBox({
+							width : "8%",
+							items:[
+								new sap.m.Label ({text: "Role End:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						roleEndEdit
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "No. Req. Days:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						noReqDaysEdit						
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "Request Status:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						requestStatusCB
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+						new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: "SAM:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						samCB, 
+						new sap.m.HBox({
+							width : "9%",
+							items:[
+								new sap.m.Label ({text: ""})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						new sap.m.HBox({
+							width : "8%",
+							items:[
+								new sap.m.Label ({text: "LOB:"})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						lobCB
+					]
+		}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin"),
+		new sap.m.HBox({
+					width : "75%",
+					items:[
+				    	new sap.m.HBox({
+							width : "12%",
+							items:[
+								new sap.m.Label ({text: ""})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+						new sap.m.Button({   
+				        	text: "Save",
+				        	press: function() {
+				        		if (ns2RMIDEdit.getValue().trim() == "")
+				        		{
+									sap.m.MessageBox.warning("NS2 RM ID cannot be blank.", {
+									    title: "Warning",                                    // default
+									    onClose: null,                                       // default
+									    styleClass: "",                                      // default
+									    initialFocus: null,                                  // default
+									    textDirection: sap.ui.core.TextDirection.Inherit     // default
+									    });
+				        			return;
+				        		}
+
+								updateRMEntry(cellsEdit[0].getText().trim(), ns2RMIDEdit.getValue().trim(), sapRMIDEdit.getValue().trim(), requestorNameCB.getValue().trim(),
+											customerNameCB.getValue().trim(), roleDescriptionEdit.getValue().trim(), commentsEdit.getValue().trim(),
+											roleStartEdit.getValue().trim(), roleEndEdit.getValue().trim(), noReqDaysEdit.getValue().trim(),
+											requestStatusCB.getSelectedItem().getText().trim(), samCB.getValue().trim(), lobCB.getValue().trim());
+				        	}
+				    	}),
+						new sap.m.HBox({
+							width : "2%",
+							items:[
+								new sap.m.Label ({text: ""})
+							]
+						}).setAlignItems(sap.m.FlexAlignItems.Center),
+				    	new sap.m.Button({   
+				        	text: "Cancel",
+				        	press: function() {
+				            	app.to("searchRMResultsPage");   
+				        	}
+				    	})
+					]
+	 	}).setAlignItems(sap.m.FlexAlignItems.Center).addStyleClass("sapUiResponsiveMargin")
+	]});
+	
+	var app = new sap.m.App("resourceManagementApp", { initialPage: "searchRMPage" }); 
+	app.addPage(searchRMPage).addPage(searchRMResultsPage).addPage(editRMEntryPage); 
+	app.placeAt("uiArea");
+	
+	</script>
+</head>
+<body class="sapUiBody">
+	<div id="uiArea"></div>
+</body>
+</html>

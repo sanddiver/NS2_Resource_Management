@@ -1,0 +1,8 @@
+{
+	"welcomeFile": "index.html",
+	"authenticationMethod": "none",
+	"routes": [{
+         "source": ".*\\.xsjs",
+         "destination": "js_be"
+	}]
+}

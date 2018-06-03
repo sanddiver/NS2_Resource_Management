@@ -1,0 +1,23 @@
+namespace NS2_Resource_Management.db;
+
+context tables {
+    entity requests {
+        key ns2RMID         : String(15) not null;
+            sapRMID         : String(15);
+            createdOn       : String(10);
+            requestorName   : String(50);
+            customerName    : String(100);
+            roleDescription : String(1024);
+            comments        : String(1024);
+            roleStart       : String(10);
+            roleEnd         : String(10);
+            noReqDays       : String(20);
+            requestStatus   : String(20);
+            sam             : String(50);
+            lob             : String(50);
+    }
+
+    entity requestStatus {
+        requestStatus : String(20);
+    }
+};
