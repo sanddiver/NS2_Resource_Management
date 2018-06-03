@@ -171,7 +171,7 @@
                 crossDomain: true,
                 statusCode: {
                 	200: function(data) {
-						sap.m.MessageBox.information("Resource Management Entry successfully updated.", {
+						sap.m.MessageBox.information("NS2 Resource Management Entry successfully updated.", {
 						    title: "Information",                                // default
 						    onClose: null,                                       // default
 						    styleClass: "",                                      // default
@@ -328,7 +328,7 @@
 	lobCB.bindItems("/lobData", lobTemplate);
 	
 	var searchRMPage = new sap.m.Page("searchRMPage", {
-    title: "Resource Management Search",
+    title: "NS2 Resource Management Search",
     content: [ 
 		new sap.m.HBox({
 					width : "75%",
@@ -435,7 +435,7 @@
 	]});
 
 	var searchRMResultsPage = new sap.m.Page("searchRMResultsPage", {
-    title: "Resource Management Search Results",
+    title: "NS2 Resource Management Search Results",
     showNavButton: true,
      navButtonPress: function(){ 
      	populateSearchSelects();
@@ -454,7 +454,7 @@
 	var noReqDaysEdit = new sap.m.Input({value:"", placeholder:"Enter No. Req. Days"});
 	
 	var editRMEntryPage = new sap.m.Page("editRMEntryPage", {
-    title: "Resource Management Edit",
+    title: "NS2 Resource Management Edit",
     showNavButton: true,
      navButtonPress: function(){ 
         app.to("searchRMResultsPage");            
