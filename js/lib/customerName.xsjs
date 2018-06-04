@@ -17,7 +17,10 @@ function customerName(withBlank)
 
 	for (var i = 0; i < rs.length; i++)
 	{
-		vData.customerNameData.push({"customerNameValue": rs[i]["customerName"]}); 
+		if (rs[i]["customerName"] !== "")
+		{
+			vData.customerNameData.push({"customerNameValue": rs[i]["customerName"]}); 
+		}
    }
 
 	oConnection.close();

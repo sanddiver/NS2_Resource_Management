@@ -132,29 +132,29 @@
 	
 	function populateUpdateComboBoxes()
 	{
-    	var requestorNameModel = new sap.ui.model.json.JSONModel("/requestorName.xsjs", false);  
+    	var requestorNameModel = new sap.ui.model.json.JSONModel("/requestorName.xsjs?withBlank=Y", false);  
 		requestorNameCB.setModel(requestorNameModel);	
-	    var customerNameModel = new sap.ui.model.json.JSONModel("/customerName.xsjs", false);  
+	    var customerNameModel = new sap.ui.model.json.JSONModel("/customerName.xsjs?withBlank=Y", false);  
 		customerNameCB.setModel(customerNameModel);
 	    var requestStatusModel = new sap.ui.model.json.JSONModel("/requestStatus.xsjs", false);  
 		requestStatusCB.setModel(requestStatusModel);
-	    var samModel = new sap.ui.model.json.JSONModel("/sam.xsjs", false);  
+	    var samModel = new sap.ui.model.json.JSONModel("/sam.xsjs?withBlank=Y", false);  
 		samCB.setModel(samModel);	
-	    var lobModel = new sap.ui.model.json.JSONModel("/lob.xsjs", false);  
+	    var lobModel = new sap.ui.model.json.JSONModel("/lob.xsjs?withBlank=Y", false);  
 		lobCB.setModel(lobModel);
 	}
 
 	function populateCreateComboBoxes()
 	{
-    	var requestorNameModel = new sap.ui.model.json.JSONModel("/requestorName.xsjs", true);  
+    	var requestorNameModel = new sap.ui.model.json.JSONModel("/requestorName.xsjs", false);  
 		requestorNameCreateCB.setModel(requestorNameModel);	
-	    var customerNameModel = new sap.ui.model.json.JSONModel("/customerName.xsjs", true);  
+	    var customerNameModel = new sap.ui.model.json.JSONModel("/customerName.xsjs", false);  
 		customerNameCreateCB.setModel(customerNameModel);
 	    var requestStatusModel = new sap.ui.model.json.JSONModel("/requestStatus.xsjs", false);  
 		requestStatusCreateCB.setModel(requestStatusModel);
-	    var samModel = new sap.ui.model.json.JSONModel("/sam.xsjs", true);  
+	    var samModel = new sap.ui.model.json.JSONModel("/sam.xsjs", false);  
 		samCreateCB.setModel(samModel);	
-	    var lobModel = new sap.ui.model.json.JSONModel("/lob.xsjs", true);  
+	    var lobModel = new sap.ui.model.json.JSONModel("/lob.xsjs", false);  
 		lobCreateCB.setModel(lobModel);
 	}
 	

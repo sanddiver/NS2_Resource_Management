@@ -17,7 +17,10 @@ function sam(withBlank)
 
 	for (var i = 0; i < rs.length; i++)
 	{
-		vData.samData.push({"samValue": rs[i]["sam"]}); 
+		if (rs[i]["sam"] !== "")
+		{
+			vData.samData.push({"samValue": rs[i]["sam"]});
+		}
    }
 
 	oConnection.close();

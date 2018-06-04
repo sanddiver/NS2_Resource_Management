@@ -17,7 +17,10 @@ function requestorName(withBlank)
 
 	for (var i = 0; i < rs.length; i++)
 	{
-		vData.requestorNameData.push({"requestorNameValue": rs[i]["requestorName"]}); 
+		if (rs[i]["requestorName"] !== "")
+		{
+			vData.requestorNameData.push({"requestorNameValue": rs[i]["requestorName"]}); 
+		}
    }
 
 	oConnection.close();

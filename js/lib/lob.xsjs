@@ -17,7 +17,10 @@ function lob(withBlank)
 
 	for (var i = 0; i < rs.length; i++)
 	{
-		vData.lobData.push({"lobValue": rs[i]["lob"]}); 
+		if (rs[i]["lob"] !== "")
+		{
+			vData.lobData.push({"lobValue": rs[i]["lob"]}); 
+		}
    }
 
 	oConnection.close();
